@@ -195,11 +195,48 @@ async def upload_data(file_data: Dict[str, Any]):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@app.post("/api/data/upload/batch")
+async def batch_upload_data(files_data: List[Dict[str, Any]]):
+    """Batch upload and process multiple data files"""
+    try:
+        result = await pipeline_manager.process_uploaded_data(files_data)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 @app.get("/api/data/sources")
 async def list_data_sources():
     """List available data sources"""
     sources = await pipeline_manager.list_data_sources()
     return {"sources": sources}
+
+@app.get("/api/data/documents")
+async def list_documents():
+    """List processed documents"""
+    documents = pipeline_manager.document_processor.list_documents()
+    return {"documents": documents}
+
+@app.get("/api/data/documents/{doc_id}")
+async def get_document(doc_id: str):
+    """Get processed document by ID"""
+    document = pipeline_manager.document_processor.get_document(doc_id)
+    if not document:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return document
+
+@app.delete("/api/data/documents/{doc_id}")
+async def delete_document(doc_id: str):
+    """Delete a processed document"""
+    success = pipeline_manager.document_processor.delete_document(doc_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return {"status": "deleted", "message": "Document deleted successfully"}
+
+@app.get("/api/data/stats")
+async def get_document_stats():
+    """Get document processing statistics"""
+    stats = pipeline_manager.document_processor.get_document_stats()
+    return {"stats": stats}
 
 # System Information Endpoints
 @app.get("/api/system/info")
@@ -220,10 +257,30 @@ async def get_system_info():
         },
         "capabilities": {
             "file_upload": True,
+            "batch_processing": True,
             "database_connection": True,
             "custom_plugins": True,
-            "real_time_query": True
+            "real_time_query": True,
+            "document_processing": True,
+            "embedding_generation": True,
+            "similarity_search": True
         }
+    }
+
+@app.get("/api/system/health")
+async def get_system_health():
+    """Get system health overview"""
+    health = await pipeline_manager.get_system_health()
+    return {"health": health}
+
+@app.get("/api/system/stats")
+async def get_system_stats():
+    """Get comprehensive system statistics"""
+    stats = await pipeline_manager.get_pipeline_stats()
+    embedding_stats = pipeline_manager.embedding_manager.get_embedding_stats()
+    return {
+        "pipeline_stats": stats,
+        "embedding_stats": embedding_stats
     }
 
 if __name__ == "__main__":
