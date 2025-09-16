@@ -1,0 +1,34 @@
+name: "FAISS Vector Database"
+type: "vectordb"
+version: "1.0.0"
+description: "Facebook AI Similarity Search for high-performance vector operations"
+entrypoint: "faiss_plugin.py"
+main_class: "FAISSVectorDBPlugin"
+capabilities:
+  - "store_vectors"
+  - "query_vectors"
+  - "fast_similarity_search"
+  - "index_optimization"
+config_schema:
+  index_type:
+    type: "string"
+    default: "flat"
+    enum: ["flat", "ivf", "hnsw"]
+    description: "FAISS index type"
+  dimension:
+    type: "integer"
+    required: true
+    description: "Vector dimension"
+  index_file:
+    type: "string"
+    default: "./faiss_index.bin"
+    description: "Path to save/load index file"
+  nlist:
+    type: "integer"
+    default: 100
+    description: "Number of clusters for IVF index"
+tags:
+  - "vectordb"
+  - "faiss"
+  - "similarity"
+  - "performance"

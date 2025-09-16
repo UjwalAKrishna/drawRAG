@@ -1,0 +1,35 @@
+name: "Anthropic Claude LLM"
+type: "llm"
+version: "1.0.0"
+description: "Anthropic Claude models for text generation"
+entrypoint: "anthropic_plugin.py"
+main_class: "AnthropicLLMPlugin"
+capabilities:
+  - "generate_text"
+  - "chat_completion"
+  - "long_context"
+config_schema:
+  api_key:
+    type: "string"
+    required: true
+    description: "Anthropic API key"
+  model:
+    type: "string"
+    default: "claude-3-haiku-20240307"
+    enum: ["claude-3-opus-20240229", "claude-3-sonnet-20240229", "claude-3-haiku-20240307"]
+    description: "Model to use"
+  temperature:
+    type: "number"
+    default: 0.7
+    minimum: 0
+    maximum: 2
+    description: "Sampling temperature"
+  max_tokens:
+    type: "integer"
+    default: 1000
+    minimum: 1
+    description: "Maximum tokens to generate"
+tags:
+  - "llm"
+  - "anthropic"
+  - "claude"

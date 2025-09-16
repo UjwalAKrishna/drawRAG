@@ -1,0 +1,29 @@
+name: "Ollama Local LLM"
+type: "llm"
+version: "1.0.0"
+description: "Local Ollama models for text generation"
+entrypoint: "ollama_plugin.py"
+main_class: "OllamaLLMPlugin"
+capabilities:
+  - "generate_text"
+  - "generate_embeddings"
+  - "local_inference"
+config_schema:
+  base_url:
+    type: "string"
+    default: "http://localhost:11434"
+    description: "Ollama server URL"
+  model:
+    type: "string"
+    required: true
+    description: "Model name (e.g., llama2, mistral)"
+  temperature:
+    type: "number"
+    default: 0.7
+    minimum: 0
+    maximum: 2
+    description: "Sampling temperature"
+tags:
+  - "llm"
+  - "ollama"
+  - "local"

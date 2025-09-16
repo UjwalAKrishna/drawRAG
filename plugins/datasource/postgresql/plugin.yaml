@@ -1,0 +1,43 @@
+name: "PostgreSQL Data Source"
+type: "datasource"
+version: "1.0.0"
+description: "Connect to PostgreSQL databases and retrieve documents"
+entrypoint: "postgresql_plugin.py"
+main_class: "PostgreSQLDataSourcePlugin"
+capabilities:
+  - "read_data"
+  - "query_data"
+  - "stream_data"
+config_schema:
+  host:
+    type: "string"
+    required: true
+    description: "PostgreSQL host"
+  port:
+    type: "integer"
+    default: 5432
+    description: "PostgreSQL port"
+  database:
+    type: "string"
+    required: true
+    description: "Database name"
+  username:
+    type: "string"
+    required: true
+    description: "Username"
+  password:
+    type: "string"
+    required: true
+    description: "Password"
+  table_name:
+    type: "string"
+    required: true
+    description: "Table name to query"
+  text_column:
+    type: "string"
+    required: true
+    description: "Column containing text data"
+tags:
+  - "datasource"
+  - "database"
+  - "postgresql"

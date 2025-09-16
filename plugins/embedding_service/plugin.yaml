@@ -1,0 +1,23 @@
+name: "Embedding Service"
+type: "utility"
+version: "1.0.0" 
+description: "Handles text embedding generation and similarity calculations"
+entrypoint: "embedding_service.py"
+main_class: "EmbeddingServicePlugin"
+capabilities:
+  - "generate_embeddings"
+  - "similarity_search"
+  - "batch_embeddings"
+config_schema:
+  cache_size:
+    type: "integer"
+    default: 10000
+    description: "Maximum number of embeddings to cache"
+  embedding_dimension:
+    type: "integer"
+    default: 384
+    description: "Embedding vector dimension"
+tags:
+  - "embedding"
+  - "similarity"
+  - "utility"

@@ -1,34 +1,22 @@
 #!/usr/bin/env python3
 """
-RAG Builder - Development Server Launcher
+RAG Builder Server Runner - Core Framework Version
 """
 
 import uvicorn
 import sys
-import os
 from pathlib import Path
 
-# Add backend to Python path
+# Add backend to path
 backend_path = Path(__file__).parent / "backend"
 sys.path.insert(0, str(backend_path))
 
-def main():
-    """Launch the development server"""
-    print("🚀 Starting RAG Builder Development Server...")
-    print("📁 Frontend: http://localhost:8000/static/index.html")
-    print("📊 API Docs: http://localhost:8000/docs")
-    print("🔧 Health Check: http://localhost:8000/health")
-    print("\n" + "="*50)
-    
-    # Start the server
+if __name__ == "__main__":
+    # Run the new core framework API
     uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
+        "api:app",
+        host="0.0.0.0", 
         port=8000,
         reload=True,
-        reload_dirs=["backend", "frontend"],
-        log_level="info"
+        reload_dirs=["backend", "plugins_builtin"]
     )
-
-if __name__ == "__main__":
-    main()

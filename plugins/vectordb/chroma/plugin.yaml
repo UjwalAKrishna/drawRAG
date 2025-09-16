@@ -1,0 +1,28 @@
+name: "ChromaDB Vector Database"
+type: "vectordb"
+version: "1.0.0"
+description: "ChromaDB vector database for similarity search"
+entrypoint: "chroma_plugin.py"
+main_class: "ChromaVectorDBPlugin"
+capabilities:
+  - "store_vectors"
+  - "query_vectors"
+  - "delete_vectors"
+  - "manage_collections"
+config_schema:
+  collection_name:
+    type: "string"
+    required: true
+    description: "Collection name"
+  persist_directory:
+    type: "string"
+    default: "./chroma_db"
+    description: "Directory to persist data"
+  embedding_function:
+    type: "string"
+    default: "default"
+    description: "Embedding function to use"
+tags:
+  - "vectordb"
+  - "chroma"
+  - "similarity"
