@@ -1,0 +1,156 @@
+# Technical Product Requirements Document (PRD)
+
+**Project Name:** Plug-and-Play RAG Builder
+**Objective:** Build a modular, extensible application that allows users to connect databases (Postgres, MySQL, SQLite, etc.) or upload documents (PDFs, text files), configure a vector database, choose an LLM, and instantly create a functional Retrieval-Augmented Generation (RAG) system. Supports plugin extensions for future LLMs, databases, vector stores, and tools.
+
+---
+
+## 1. Goals
+
+* Enable non-technical users to build a **custom RAG pipeline** in minutes.
+* Provide a **drag-and-drop UI** to configure components: Data Source → Vector Store → LLM → RAG Pipeline.
+* Ensure **pluggable architecture** so developers can add support for new components (LLMs, databases, vector DBs, file parsers).
+* Prioritize **fast development** over perfect architecture; build an MVP quickly that can be iterated.
+
+---
+
+## 2. Core Features
+
+### 2.1 User Interface (Frontend)
+
+* **Stack:** HTML, CSS, JS.
+* **Drag-and-drop RAG Builder Canvas:**
+
+  * Data Sources (Postgres, MySQL, SQLite, PDF/Docs upload, API connectors).
+  * Vector Databases (Chroma, Pinecone, Weaviate, FAISS, Milvus, etc.).
+  * LLMs (OpenAI, Anthropic, LLaMA, Ollama, Local LLMs).
+* **Component Cards:** Each block (data source, vector DB, LLM) is represented as a draggable card. Users can connect them visually (arrows or pipelines).
+* **Plugin Manager UI:**
+
+  * Upload plugin (zip/JSON/YAML + code).
+  * Enable/disable plugins.
+  * Browse installed plugins.
+* **RAG Pipeline Preview:** Auto-generated YAML/JSON config file viewable and downloadable.
+* **Run Test Query:** Input a question → system runs through pipeline → shows answer + retrieval context.
+
+### 2.2 Backend (FastAPI)
+
+* **Stack:** FastAPI (Python), Uvicorn/Gunicorn, Pydantic for validation.
+* **Core API Modules:**
+
+  1. **Data Source Manager**
+
+     * Plugins for connecting to databases (Postgres, MySQL, SQLite).
+     * Document ingestion (PDF, TXT, DOCX parsers).
+     * APIs for crawling (optional future).
+  2. **Vector Database Manager**
+
+     * Default: ChromaDB (fast, lightweight, local).
+     * Extensible: FAISS, Pinecone, Weaviate, Milvus.
+     * Unified API (`store_vectors`, `query_vectors`).
+  3. **LLM Manager**
+
+     * Default: OpenAI GPT-4o-mini.
+     * Extensible: Anthropic, LLaMA/Ollama, HuggingFace models.
+     * Unified API (`generate_response(context, query)`).
+  4. **RAG Orchestrator**
+
+     * Takes query → retrieves embeddings → queries vector DB → sends context + query to chosen LLM → returns answer.
+     * Logs intermediate steps for debugging.
+  5. **Plugin Manager**
+
+     * Plugins stored in `/plugins` directory.
+     * Each plugin has a manifest (YAML/JSON) with metadata: type (LLM, DB, VectorStore, Tool), version, dependencies.
+     * FastAPI dynamically imports plugins.
+     * Secure sandbox execution (basic isolation).
+  6. **Auth & Security (MVP level)**
+
+     * Basic login with JWT.
+     * API key for LLM providers stored encrypted.
+
+### 2.3 Data Flow (MVP)
+
+1. User uploads data source / connects DB.
+2. Backend ingests & generates embeddings using selected embedding model (default: OpenAI `text-embedding-3-small`).
+3. Embeddings stored in chosen vector DB.
+4. Query: User enters question → retrieved context → LLM response generated.
+5. Response shown in UI + JSON.
+
+---
+
+## 3. Non-Functional Requirements
+
+* **Performance:** Must handle small-to-medium datasets (10k–100k docs) efficiently on a laptop.
+* **Extensibility:** Plugin system should allow third-party developers to drop new integrations.
+* **Privacy:** Must allow fully local setup (SQLite + Chroma + Local LLM).
+* **Deployment:**
+
+  * Local: `docker-compose up` (FastAPI + Frontend).
+  * Cloud: Deployable on AWS/GCP/Azure with PostgreSQL backend.
+
+---
+
+## 4. Plugin Architecture (WordPress/Odoo-style)
+
+* **Plugin Types:**
+
+  * DataSourcePlugin (Postgres/MySQL/Docs).
+  * VectorDBPlugin (Chroma, FAISS, Pinecone).
+  * LLMPlugin (OpenAI, HuggingFace, Ollama).
+  * ToolPlugin (custom logic e.g., calculator, search).
+* **Plugin Manifest Example (plugin.yaml):**
+
+```yaml
+name: Pinecone VectorDB
+type: vectordb
+version: 1.0
+entrypoint: pinecone_plugin.py
+dependencies:
+  - pinecone-client
+```
+
+* **Plugin Lifecycle:** Install → Enable → Configure → Use in RAG pipeline.
+
+---
+
+## 5. Tech Stack
+
+* **Frontend:** HTML, CSS, JS
+* **Backend:** FastAPI, Python 3.10+.
+* **Database:** PostgreSQL (for system metadata & config).
+* **VectorDB:** Chroma (default, pluggable).
+* **Auth:** JWT, bcrypt for password hashing.
+* **Deployment:** Dockerized services.
+
+---
+
+## 6. Roadmap 
+
+* FastAPI backend with RAG orchestration.
+* UI with drag-and-drop builder (limited components).
+* Support: SQLite + Chroma + OpenAI GPT.
+* Simple plugin loader.
+
+### 
+
+* Add Postgres, MySQL, PDF ingestion.
+* Add FAISS + Pinecone support.
+* Add Anthropic + Ollama.
+* Plugin Manager UI.
+
+### 
+
+* Add marketplace for plugins.
+* Add pipelines export/import (JSON/YAML).
+* Add monitoring/logging dashboard.
+* Deploy to cloud with auth + multi-user.
+
+---
+
+## 7. Risks
+
+* Plugin sandboxing for security is non-trivial → for MVP, trust plugins.
+* LLM API costs may rise → provide local LLM option early.
+* Drag-and-drop UI may slow MVP → fallback: dropdown-based config first, then canvas builder.
+
+

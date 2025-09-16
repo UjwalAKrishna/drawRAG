@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Builder - Drag & Drop Pipeline Creator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1>🔗 RAG Pipeline Builder</h1>
+            <div class="header-actions">
+                <button id="save-pipeline-btn" class="btn btn-success">💾 Save Pipeline</button>
+                <button id="load-pipeline-btn" class="btn btn-info">📂 Load Pipeline</button>
+                <button id="test-query-btn" class="btn btn-primary">🔍 Test Query</button>
+                <button id="export-config-btn" class="btn btn-secondary">📤 Export</button>
+                <div class="pipeline-status" id="pipeline-status">
+                    <span class="status-indicator" id="status-indicator">●</span>
+                    <span id="status-text">Ready</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Component Palette -->
+            <aside class="component-palette">
+                <h3>Components</h3>
+                
+                <div class="component-category">
+                    <h4>📊 Data Sources</h4>
+                    <div class="component-item" draggable="true" data-type="datasource" data-subtype="sqlite">
+                        <div class="component-icon">🗄️</div>
+                        <span>SQLite</span>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="datasource" data-subtype="upload">
+                        <div class="component-icon">📄</div>
+                        <span>File Upload</span>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="datasource" data-subtype="postgres">
+                        <div class="component-icon">🐘</div>
+                        <span>PostgreSQL</span>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="datasource" data-subtype="mysql">
+                        <div class="component-icon">🐬</div>
+                        <span>MySQL</span>
+                    </div>
+                </div>
+
+                <div class="component-category">
+                    <h4>🔍 Vector Databases</h4>
+                    <div class="component-item" draggable="true" data-type="vectordb" data-subtype="chroma">
+                        <div class="component-icon">🎨</div>
+                        <span>ChromaDB</span>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="vectordb" data-subtype="faiss">
+                        <div class="component-icon">🔢</div>
+                        <span>FAISS</span>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="vectordb" data-subtype="pinecone">
+                        <div class="component-icon">🌲</div>
+                        <span>Pinecone</span>
+                    </div>
+                </div>
+
+                <div class="component-category">
+                    <h4>🤖 LLMs</h4>
+                    <div class="component-item" draggable="true" data-type="llm" data-subtype="openai">
+                        <div class="component-icon">🧠</div>
+                        <span>OpenAI GPT</span>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="llm" data-subtype="anthropic">
+                        <div class="component-icon">🎭</div>
+                        <span>Anthropic Claude</span>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="llm" data-subtype="lmstudio">
+                        <div class="component-icon">🎬</div>
+                        <span>LM Studio</span>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="llm" data-subtype="ollama">
+                        <div class="component-icon">🦙</div>
+                        <span>Ollama</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Canvas Area -->
+            <main class="canvas-container">
+                <div class="canvas" id="pipeline-canvas">
+                    <div class="canvas-placeholder">
+                        <h3>🎯 Drag components here to build your RAG pipeline</h3>
+                        <p>Start by dragging a Data Source, then a Vector Database, and finally an LLM</p>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Configuration Panel -->
+            <aside class="config-panel" id="config-panel">
+                <div class="config-header">
+                    <h3>⚙️ Configuration</h3>
+                    <div class="config-tabs">
+                        <button class="tab-btn active" data-tab="component">Component</button>
+                        <button class="tab-btn" data-tab="pipeline">Pipeline</button>
+                        <button class="tab-btn" data-tab="logs">Logs</button>
+                    </div>
+                </div>
+                
+                <div class="tab-content active" id="component-tab">
+                    <div class="config-content" id="config-content">
+                        <p>Select a component to configure its settings</p>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="pipeline-tab">
+                    <div class="pipeline-info">
+                        <h4>Pipeline Overview</h4>
+                        <div class="pipeline-stats" id="pipeline-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Components:</span>
+                                <span class="stat-value" id="component-count">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Connections:</span>
+                                <span class="stat-value" id="connection-count">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Status:</span>
+                                <span class="stat-value" id="pipeline-health">Not Ready</span>
+                            </div>
+                        </div>
+                        
+                        <h4>Pipeline Settings</h4>
+                        <div class="form-group">
+                            <label for="pipeline-name">Pipeline Name:</label>
+                            <input type="text" id="pipeline-name" placeholder="My RAG Pipeline">
+                        </div>
+                        <div class="form-group">
+                            <label for="pipeline-description">Description:</label>
+                            <textarea id="pipeline-description" placeholder="Describe your pipeline..."></textarea>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="validate-pipeline-btn">Validate Pipeline</button>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="logs-tab">
+                    <div class="logs-container">
+                        <div class="logs-header">
+                            <h4>Activity Logs</h4>
+                            <button class="btn btn-small" id="clear-logs-btn">Clear</button>
+                        </div>
+                        <div class="logs-content" id="logs-content">
+                            <div class="log-entry info">
+                                <span class="log-time">12:00:00</span>
+                                <span class="log-message">RAG Builder initialized</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Test Query Modal -->
+        <div class="modal" id="test-query-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>🔍 Test Your RAG Pipeline</h3>
+                    <button class="modal-close" id="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="test-query-input">Enter your question:</label>
+                        <textarea id="test-query-input" placeholder="What would you like to know?"></textarea>
+                    </div>
+                    <button id="run-query-btn" class="btn btn-primary">Run Query</button>
+                    <div class="query-result" id="query-result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
