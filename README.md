@@ -1,165 +1,102 @@
-# 🔗 RAG Builder - Plug-and-Play RAG Pipeline Creator
+# 🚀 RAG Builder v2.0
 
-A visual drag-and-drop interface for building Retrieval-Augmented Generation (RAG) pipelines without code.
+**The Ultimate Dynamic Plugin Framework for RAG Applications**
 
-## 🚀 Quick Start
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Framework](https://img.shields.io/badge/Framework-Dynamic%20Plugins-orange.svg)](https://github.com/ragbuilder/ragbuilder)
 
-### Prerequisites
-- Python 3.8+
-- pip
+> **Zero Configuration • Hot Reloading • Enterprise Grade**
 
-### Installation
+RAG Builder makes building Retrieval-Augmented Generation applications as easy as writing Python functions. Create production-ready RAG systems in minutes, not months.
 
-1. **Clone/Download the project**
-2. **Install dependencies:**
-   ```bash
-   pip install fastapi uvicorn pydantic python-multipart pyyaml
-   ```
+## ✨ **Why RAG Builder?**
 
-3. **Start the server:**
-   ```bash
-   python run_server.py
-   ```
+```python
+# Create a plugin in 30 seconds
+def clean_text(text: str) -> str:
+    return text.strip().lower()
 
-4. **Open your browser:**
-   - Frontend: http://localhost:8000/static/index.html
-   - API Docs: http://localhost:8000/docs
+def count_words(text: str) -> int:
+    return len(text.split())
 
-## 🎯 Features
-
-### ✅ Current MVP Features
-- **Drag-and-Drop UI**: Visual pipeline builder with component palette
-- **Component Library**: Data Sources, Vector DBs, and LLMs
-- **Real-time Configuration**: Configure components via side panel
-- **Pipeline Visualization**: See connections between components
-- **Test Queries**: Test your pipeline with sample questions
-- **Export/Import**: Save and load pipeline configurations
-- **Plugin System**: Extensible architecture for new components
-
-### 🔌 Available Components
-
-**Data Sources:**
-- SQLite Database
-- File Upload (PDF, TXT)
-- PostgreSQL (planned)
-
-**Vector Databases:**
-- ChromaDB
-- FAISS
-- Pinecone (planned)
-
-**LLMs:**
-- OpenAI GPT
-- Ollama (Local)
-- Anthropic (planned)
-
-## 🎮 How to Use
-
-1. **Open the web interface** at http://localhost:8000/static/index.html
-2. **Drag components** from the left palette to the canvas
-3. **Connect components** by dragging them in order: Data Source → Vector DB → LLM
-4. **Configure each component** by clicking on it and filling the configuration panel
-5. **Test your pipeline** using the "Test Query" button
-6. **Export your configuration** to save your work
-
-## 🏗️ Architecture
-
-```
-Frontend (HTML/CSS/JS)
-├── Drag-and-drop interface
-├── Component configuration
-└── Query testing
-
-Backend (FastAPI)
-├── Pipeline Manager
-├── Plugin Manager
-├── Component validation
-└── Query execution
-
-Plugin System
-├── Built-in plugins
-├── External plugin support
-└── Configuration schemas
+# That's it! Framework auto-discovers and loads your plugin
 ```
 
-## 🔧 Development
+### **🎯 Zero Configuration**
+- **No YAML manifests** - Just write Python functions
+- **Auto-discovery** - Framework finds everything automatically  
+- **Hot reloading** - Update plugins without restart
+- **Instant deployment** - From code to production in seconds
 
-### Project Structure
-```
-/
-├── frontend/              # Web interface
-│   ├── index.html        # Main UI
-│   ├── styles.css        # Styling
-│   └── script.js         # Drag-and-drop logic
-├── backend/              # Core framework only
-│   ├── main.py          # API endpoints
-│   ├── models.py        # Data models
-│   └── services/        # Core services
-│       ├── base_plugin.py    # Plugin base classes
-│       ├── plugin_manager.py # Plugin management
-│       └── pipeline_manager.py # Pipeline orchestration
-├── plugins/             # All plugins (external to backend)
-│   ├── llm/            # LLM plugins
-│   │   ├── openai_plugin.py
-│   │   └── ollama_plugin.py
-│   ├── vectordb/       # Vector database plugins
-│   │   ├── chroma_plugin.py
-│   │   └── faiss_plugin.py
-│   ├── datasource/     # Data source plugins
-│   └── embedding/      # Embedding plugins
-├── run_server.py       # Development server
-├── install.py         # Installation script
-└── test_real_plugins.py # Plugin testing
-```
+### **⚡ Super Dynamic**
+- **Any Python callable** becomes a plugin capability
+- **Dynamic routing** - Call any capability by name
+- **Smart caching** - Automatic performance optimization
+- **Load balancing** - Intelligent plugin selection
 
-### Running Tests
+### **🏢 Enterprise Ready**
+- **Advanced metrics** - Real-time performance monitoring
+- **Error recovery** - Comprehensive error handling
+- **Security validation** - Multi-layer plugin validation
+- **Dependency resolution** - Automatic plugin dependencies
+
+## 🚀 **Quick Start**
+
+### **1. Installation**
+
 ```bash
-python tmp_rovodev_test_basic.py  # Basic functionality test
-python demo.py                   # Full feature demo
+git clone https://github.com/ragbuilder/ragbuilder.git
+cd ragbuilder
+pip install -r requirements.txt
 ```
 
-## 📋 Current Status
+### **2. Start the Framework**
 
-This is an **MVP (Minimum Viable Product)** focused on rapid prototyping. The system includes:
+```bash
+python run_server.py
+```
 
-- ✅ Working drag-and-drop UI
-- ✅ Component management system
-- ✅ Plugin architecture foundation
-- ✅ Mock query execution
-- ✅ Configuration validation
-- 🔄 Real LLM integration (in progress)
-- 🔄 Actual vector database connections (in progress)
-- 🔄 File upload processing (in progress)
+Framework starts at `http://localhost:8000` with auto-discovered plugins!
 
-## 🛣️ Roadmap
+### **3. Create Your First Plugin**
 
-### Phase 1 (Current MVP)
-- [x] Drag-and-drop UI
-- [x] Basic component system
-- [x] Plugin architecture
-- [x] Mock query execution
+```bash
+# Use the CLI to scaffold a new plugin
+rag-plugin init my-awesome-plugin --type llm
 
-### Phase 2 (Next)
-- [ ] Real LLM integrations (OpenAI, Ollama)
-- [ ] Vector database connections (ChromaDB, FAISS)
-- [ ] File upload and processing
-- [ ] Database connectors
+# Or just create a Python file in plugins/
+echo 'def hello(name): return f"Hello {name}!"' > plugins/my_plugin.py
+```
 
-### Phase 3 (Future)
-- [ ] User authentication
-- [ ] Pipeline sharing
-- [ ] Advanced plugin marketplace
-- [ ] Cloud deployment
+### **4. Test Your Plugin**
 
-## 🤝 Contributing
+```bash
+# Framework automatically discovers and loads your plugin
+curl -X POST http://localhost:8000/api/call/hello \
+  -H "Content-Type: application/json" \
+  -d '{"args": ["World"]}'
 
-This project prioritizes **fast development** and **working prototypes**. To contribute:
+# Response: {"success": true, "result": "Hello World!"}
+```
 
-1. Focus on getting features working quickly
-2. Use the existing plugin system for new components
-3. Update the build-log.md with completed features
-4. Test with the demo script
+## 📚 **Documentation**
 
-## 📝 License
+- **[📚 Complete Documentation](docs/)** - Architecture, guides, and API reference
+- **[🏗️ Architecture Guide](docs/architecture/)** - Framework design and concepts  
+- **[🔌 Plugin Development](docs/guides/)** - Create your own plugins
+- **[🛠️ CLI & SDK Reference](docs/reference/)** - Tools and utilities
+- **[💡 Examples](docs/examples/)** - Real-world implementations
 
-MIT License - Build amazing RAG systems!
+## 🌟 **Community**
+
+- **GitHub**: [github.com/ragbuilder/ragbuilder](https://github.com/ragbuilder/ragbuilder)
+- **Discord**: [Join our community](https://discord.gg/ragbuilder)
+- **Twitter**: [@ragbuilder](https://twitter.com/ragbuilder)
+- **Docs**: [docs.ragbuilder.dev](https://docs.ragbuilder.dev)
+
+---
+
+**Built with ❤️ by the RAG Builder community**
+
+*Making RAG development as easy as writing Python functions.*

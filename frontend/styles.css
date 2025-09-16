@@ -248,6 +248,19 @@ body {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
+.dropped-component.dragging {
+    cursor: grabbing !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    z-index: 1000;
+    transition: none !important;
+    transform-origin: center;
+}
+
+.dropped-component.selected {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
 .dropped-component.selected {
     border-color: #4299e1;
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
@@ -543,20 +556,496 @@ body {
     border-radius: 8px;
     border-left: 4px solid #4299e1;
     display: none;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
 .query-result.show {
     display: block;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.1rem;
+    color: #4299e1;
+}
+
+.query-response {
+    space-y: 1.5rem;
+}
+
+.simulation-notice {
+    background: #fef5e7;
+    color: #d69e2e;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    border: 1px solid #f6e05e;
+}
+
+.answer-section, .sources-section, .pipeline-section, .metrics-section {
+    margin-bottom: 1.5rem;
+}
+
+.answer-section h4, .sources-section h4, .pipeline-section h4, .metrics-section h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2d3748;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.answer-content {
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 3px solid #48bb78;
+    line-height: 1.6;
+}
+
+.sources-list {
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 0;
+    border-left: 3px solid #4299e1;
+}
+
+.sources-list li {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: #f7fafc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.pipeline-flow {
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 3px solid #9f7aea;
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 3px solid #ed8936;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: #718096;
+    margin-bottom: 0.25rem;
+}
+
+.metric-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.error-response {
+    background: #fed7d7;
+    color: #c53030;
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 3px solid #e53e3e;
+}
+
+.error-response h4 {
+    margin: 0 0 0.5rem 0;
+}
+
+.error-response details {
+    margin-top: 1rem;
+}
+
+.error-response summary {
+    cursor: pointer;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.error-response pre {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    overflow-x: auto;
 }
 
 /* Drag and Drop States */
 .canvas.drag-over {
     background-color: rgba(66, 153, 225, 0.1);
+    border: 2px dashed #4299e1;
 }
 
 .component-item.dragging {
     opacity: 0.5;
     transform: rotate(5deg);
+}
+
+/* Loading States */
+.app-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.loader-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f4f6;
+    border-top: 4px solid #4299e1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Notification System */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 1001;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-info {
+    background: #4299e1;
+}
+
+.notification-success {
+    background: #48bb78;
+}
+
+.notification-warning {
+    background: #ed8936;
+}
+
+.notification-error {
+    background: #f56565;
+}
+
+/* Component Status Indicators */
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.status-indicator.ready {
+    background: #48bb78;
+}
+
+.status-indicator.working {
+    background: #ed8936;
+    animation: pulse 2s infinite;
+}
+
+.status-indicator.disconnected {
+    background: #f56565;
+}
+
+.status-indicator.connected {
+    background: #48bb78;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Component Item Improvements */
+.component-item {
+    cursor: grab;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+/* Component Ports */
+.component-ports {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.input-port, .output-port {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #4299e1;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.input-port:hover, .output-port:hover {
+    background: #4299e1;
+    transform: scale(1.2);
+}
+
+.connection-target {
+    background: #48bb78 !important;
+    border-color: #48bb78 !important;
+    transform: scale(1.3) !important;
+}
+
+/* Connection Lines */
+.connection-line {
+    stroke: #4299e1 !important;
+    stroke-width: 3px !important;
+    fill: none !important;
+    opacity: 1 !important;
+    z-index: 100 !important;
+}
+
+.connection-path {
+    stroke: #4299e1 !important;
+    stroke-width: 3px !important;
+    fill: none !important;
+    opacity: 1 !important;
+}
+
+.connection-svg {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: none !important;
+    z-index: 100 !important;
+    overflow: visible !important;
+}
+
+/* Component Action Buttons */
+.component-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.component-action-btn {
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.component-action-btn:hover {
+    background: rgba(0,0,0,0.1);
+}
+
+.component-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.component-item:active {
+    cursor: grabbing;
+}
+
+/* Canvas Improvements */
+.canvas-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #718096;
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+.canvas-placeholder h3 {
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+}
+
+/* Connection Lines */
+.connection-line {
+    pointer-events: none;
+    z-index: 1;
+}
+
+.connection-path {
+    stroke: #4299e1;
+    stroke-width: 2;
+    fill: none;
+    stroke-dasharray: 5,5;
+    animation: dash 20s linear infinite;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: -100;
+    }
+}
+
+/* Component on Canvas */
+.dropped-component {
+    position: absolute;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    min-width: 200px;
+    cursor: move;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.dropped-component:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.dropped-component.selected {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.dropped-component.dragging {
+    transform: rotate(2deg);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.component-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.component-icon {
+    font-size: 1.5rem;
+}
+
+.component-info {
+    flex: 1;
+}
+
+.component-title {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 0.9rem;
+}
+
+.component-status {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin-top: 0.25rem;
+}
+
+.component-status.unconfigured {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+.component-status.configured {
+    background: #c6f6d5;
+    color: #2f855a;
+}
+
+.component-status.error {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+.component-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.component-action-btn {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.2s ease;
+}
+
+.component-action-btn:hover {
+    background: #f7fafc;
+}
+
+.component-ports {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+.input-port, .output-port {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    border: 2px solid #a0aec0;
+    cursor: pointer;
+}
+
+.input-port:hover, .output-port:hover {
+    background: #4299e1;
+    border-color: #3182ce;
 }
 
 /* Responsive Design */

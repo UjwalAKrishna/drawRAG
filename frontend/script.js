@@ -49,6 +49,105 @@ class RAGBuilder {
                 this.deselectComponent();
             }
         });
+        
+        // Keyboard shortcuts
+        this.setupKeyboardShortcuts();
+        
+        // Auto-save pipeline state to localStorage
+        this.setupAutoSave();
+    }
+    
+    setupKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + S - Save pipeline
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                this.savePipeline();
+            }
+            
+            // Ctrl/Cmd + T - Test query (open modal)
+            if ((e.ctrlKey || e.metaKey) && e.key === 't') {
+                e.preventDefault();
+                this.openTestModal();
+            }
+            
+            // Escape - Close modal or deselect
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('test-query-modal');
+                if (modal.classList.contains('show')) {
+                    this.closeTestModal();
+                } else {
+                    this.deselectComponent();
+                }
+            }
+            
+            // Delete - Delete selected component
+            if (e.key === 'Delete' && this.selectedComponent) {
+                this.deleteComponent(this.selectedComponent);
+            }
+        });
+        
+        // Enter key in test query input
+        document.getElementById('test-query-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.runTestQuery();
+            }
+        });
+    }
+    
+    setupAutoSave() {
+        // Auto-save pipeline state every 30 seconds
+        setInterval(() => {
+            if (this.components.size > 0) {
+                this.autoSavePipeline();
+            }
+        }, 30000);
+        
+        // Save before page unload
+        window.addEventListener('beforeunload', (e) => {
+            if (this.components.size > 0) {
+                this.autoSavePipeline();
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        });
+        
+        // Load auto-saved state on startup
+        this.loadAutoSavedPipeline();
+    }
+    
+    autoSavePipeline() {
+        try {
+            const config = this.getPipelineConfig();
+            const autoSaveData = {
+                name: this.pipelineName || 'Auto-saved Pipeline',
+                description: this.pipelineDescription || '',
+                timestamp: new Date().toISOString(),
+                version: '1.0',
+                autoSaved: true,
+                ...config
+            };
+            
+            localStorage.setItem('ragbuilder_autosave', JSON.stringify(autoSaveData));
+            this.addLog('Pipeline auto-saved', 'info');
+        } catch (error) {
+            console.warn('Auto-save failed:', error);
+        }
+    }
+    
+    loadAutoSavedPipeline() {
+        try {
+            const autoSaved = localStorage.getItem('ragbuilder_autosave');
+            if (autoSaved) {
+                const data = JSON.parse(autoSaved);
+                if (data.autoSaved && confirm('Found an auto-saved pipeline. Would you like to restore it?')) {
+                    this.loadPipelineFromData(data);
+                    this.addLog('Auto-saved pipeline restored', 'success');
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to load auto-saved pipeline:', error);
+        }
     }
 
     setupDragAndDrop() {
@@ -514,45 +613,174 @@ class RAGBuilder {
             return;
         }
 
+        // Validate pipeline before running query
+        if (!this.hasValidPipeline()) {
+            this.showNotification('Please configure a complete pipeline before testing', 'error');
+            return;
+        }
+
         const resultDiv = document.getElementById('query-result');
-        resultDiv.innerHTML = '<p>🔄 Processing your query...</p>';
+        resultDiv.innerHTML = '<div class="loading-spinner">🔄 Processing your query...</div>';
         resultDiv.classList.add('show');
 
         try {
             // Get pipeline configuration
             const pipelineConfig = this.getPipelineConfig();
             
-            // Simulate API call (replace with actual backend call)
-            const response = await this.simulateQuery(query, pipelineConfig);
+            // Try actual API call first, fall back to simulation
+            let response;
+            try {
+                response = await this.callRealAPI(query, pipelineConfig);
+            } catch (apiError) {
+                console.warn('API call failed, using simulation:', apiError);
+                response = await this.simulateQuery(query, pipelineConfig);
+                response.simulated = true;
+            }
             
             resultDiv.innerHTML = `
-                <h4>📝 Answer:</h4>
-                <p>${response.answer}</p>
-                <h4>📚 Sources:</h4>
-                <ul>
-                    ${response.sources.map(source => `<li>${source}</li>`).join('')}
-                </ul>
-                <h4>⚙️ Pipeline Used:</h4>
-                <p>${response.pipeline}</p>
+                <div class="query-response">
+                    ${response.simulated ? '<div class="simulation-notice">⚠️ This is a simulated response (backend not connected)</div>' : ''}
+                    <div class="answer-section">
+                        <h4>📝 Answer:</h4>
+                        <div class="answer-content">${response.answer}</div>
+                    </div>
+                    <div class="sources-section">
+                        <h4>📚 Sources:</h4>
+                        <ul class="sources-list">
+                            ${response.sources.map(source => `<li>${source}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="pipeline-section">
+                        <h4>⚙️ Pipeline Used:</h4>
+                        <div class="pipeline-flow">${response.pipeline}</div>
+                    </div>
+                    <div class="metrics-section">
+                        <h4>📊 Metrics:</h4>
+                        <div class="metrics-grid">
+                            <div class="metric">
+                                <span class="metric-label">Response Time:</span>
+                                <span class="metric-value">${response.metrics?.responseTime || 'N/A'}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Sources Found:</span>
+                                <span class="metric-value">${response.sources.length}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Confidence:</span>
+                                <span class="metric-value">${response.metrics?.confidence || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             `;
+            
+            this.addLog(`Query executed: "${query.substring(0, 50)}${query.length > 50 ? '...' : ''}"`, 'success');
         } catch (error) {
-            resultDiv.innerHTML = `<p style="color: #e53e3e;">❌ Error: ${error.message}</p>`;
+            resultDiv.innerHTML = `
+                <div class="error-response">
+                    <h4>❌ Error</h4>
+                    <p>${error.message}</p>
+                    <details>
+                        <summary>Technical Details</summary>
+                        <pre>${error.stack || error.toString()}</pre>
+                    </details>
+                </div>
+            `;
+            this.addLog(`Query failed: ${error.message}`, 'error');
         }
     }
 
-    async simulateQuery(query, config) {
-        // Simulate processing delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
+    async callRealAPI(query, config) {
+        const startTime = Date.now();
+        
+        // Build the request payload
+        const payload = {
+            query: query,
+            pipeline_config: {
+                datasource: this.getComponentConfig('datasource'),
+                vectordb: this.getComponentConfig('vectordb'),
+                llm: this.getComponentConfig('llm')
+            }
+        };
+        
+        const response = await fetch('/api/rag/query', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API call failed: ${response.status} ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        const responseTime = Date.now() - startTime;
         
         return {
-            answer: `This is a simulated response to: "${query}". In a real implementation, this would be processed through your configured RAG pipeline.`,
-            sources: [
-                'Document 1: Sample content related to your query',
-                'Document 2: Additional relevant information',
-                'Document 3: Supporting context'
-            ],
-            pipeline: config.summary || 'No pipeline configured'
+            answer: result.answer,
+            sources: result.sources || [],
+            pipeline: config.summary,
+            metrics: {
+                responseTime: `${responseTime}ms`,
+                confidence: result.confidence || '85%',
+                tokensUsed: result.tokens_used || 'N/A'
+            }
         };
+    }
+
+    async simulateQuery(query, config) {
+        const startTime = Date.now();
+        
+        // Simulate realistic processing delay based on query complexity
+        const baseDelay = 800;
+        const complexityDelay = Math.min(query.length * 10, 1000);
+        await new Promise(resolve => setTimeout(resolve, baseDelay + complexityDelay));
+        
+        const responseTime = Date.now() - startTime;
+        
+        // Generate more realistic simulated responses
+        const sampleResponses = {
+            'what': 'Based on the available documents, here is what I found regarding your question...',
+            'how': 'Here\'s a step-by-step explanation of the process...',
+            'why': 'The main reasons for this are...',
+            'when': 'According to the timeline in the documents...',
+            'where': 'The location information indicates...',
+            'who': 'The relevant parties involved are...'
+        };
+        
+        const queryType = Object.keys(sampleResponses).find(type => 
+            query.toLowerCase().startsWith(type)
+        ) || 'what';
+        
+        const baseAnswer = sampleResponses[queryType];
+        
+        return {
+            answer: `${baseAnswer} This is a simulated response to: "${query}". In a real implementation, this would be processed through your configured RAG pipeline using ${config.datasource} → ${config.vectordb} → ${config.llm}.`,
+            sources: [
+                `Document A: Content relevance score 0.89 - "${query.substring(0, 30)}..."`,
+                `Document B: Content relevance score 0.76 - Related information found`,
+                `Document C: Content relevance score 0.63 - Supporting context available`
+            ],
+            pipeline: config.summary || 'No pipeline configured',
+            metrics: {
+                responseTime: `${responseTime}ms`,
+                confidence: `${Math.floor(Math.random() * 20 + 75)}%`,
+                tokensUsed: Math.floor(Math.random() * 500 + 200)
+            },
+            simulated: true
+        };
+    }
+
+    getComponentConfig(type) {
+        const component = Array.from(this.components.values()).find(c => c.type === type);
+        return component ? {
+            name: component.name,
+            subtype: component.subtype,
+            config: component.config,
+            status: component.status
+        } : null;
     }
 
     getPipelineConfig() {

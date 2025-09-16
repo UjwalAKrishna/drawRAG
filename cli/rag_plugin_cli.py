@@ -12,10 +12,10 @@ import yaml
 from typing import Dict, Any, Optional
 
 try:
-    from .commands import InitCommand, ValidateCommand, TestCommand, BuildCommand, DevServerCommand
+    from .commands import InitCommand, ValidateCommand, TestCommand, BuildCommand, DevServerCommand, FrameworkCommand
 except ImportError:
     # Fallback for direct execution
-    from commands import InitCommand, ValidateCommand, TestCommand, BuildCommand, DevServerCommand
+    from commands import InitCommand, ValidateCommand, TestCommand, BuildCommand, DevServerCommand, FrameworkCommand
 
 
 class PluginCLI:
@@ -28,7 +28,8 @@ class PluginCLI:
             'validate': ValidateCommand(),
             'test': TestCommand(),
             'build': BuildCommand(),
-            'dev-server': DevServerCommand()
+            'dev-server': DevServerCommand(),
+            'framework': FrameworkCommand()
         }
     
     def _create_parser(self) -> argparse.ArgumentParser:
@@ -156,6 +157,19 @@ Examples:
             '--host',
             default='localhost',
             help='Server host'
+        )
+        
+        # Framework command
+        framework_parser = subparsers.add_parser(
+            'framework',
+            help='Interact with the framework directly'
+        )
+        framework_parser.add_argument(
+            'action',
+            nargs='?',
+            default='status',
+            choices=['status', 'test', 'metrics', 'plugins', 'capabilities'],
+            help='Action to perform'
         )
         
         return parser

@@ -26,62 +26,7 @@
             <!-- Component Palette -->
             <aside class="component-palette">
                 <h3>Components</h3>
-                
-                <div class="component-category">
-                    <h4>📊 Data Sources</h4>
-                    <div class="component-item" draggable="true" data-type="datasource" data-subtype="sqlite">
-                        <div class="component-icon">🗄️</div>
-                        <span>SQLite</span>
-                    </div>
-                    <div class="component-item" draggable="true" data-type="datasource" data-subtype="upload">
-                        <div class="component-icon">📄</div>
-                        <span>File Upload</span>
-                    </div>
-                    <div class="component-item" draggable="true" data-type="datasource" data-subtype="postgres">
-                        <div class="component-icon">🐘</div>
-                        <span>PostgreSQL</span>
-                    </div>
-                    <div class="component-item" draggable="true" data-type="datasource" data-subtype="mysql">
-                        <div class="component-icon">🐬</div>
-                        <span>MySQL</span>
-                    </div>
-                </div>
-
-                <div class="component-category">
-                    <h4>🔍 Vector Databases</h4>
-                    <div class="component-item" draggable="true" data-type="vectordb" data-subtype="chroma">
-                        <div class="component-icon">🎨</div>
-                        <span>ChromaDB</span>
-                    </div>
-                    <div class="component-item" draggable="true" data-type="vectordb" data-subtype="faiss">
-                        <div class="component-icon">🔢</div>
-                        <span>FAISS</span>
-                    </div>
-                    <div class="component-item" draggable="true" data-type="vectordb" data-subtype="pinecone">
-                        <div class="component-icon">🌲</div>
-                        <span>Pinecone</span>
-                    </div>
-                </div>
-
-                <div class="component-category">
-                    <h4>🤖 LLMs</h4>
-                    <div class="component-item" draggable="true" data-type="llm" data-subtype="openai">
-                        <div class="component-icon">🧠</div>
-                        <span>OpenAI GPT</span>
-                    </div>
-                    <div class="component-item" draggable="true" data-type="llm" data-subtype="anthropic">
-                        <div class="component-icon">🎭</div>
-                        <span>Anthropic Claude</span>
-                    </div>
-                    <div class="component-item" draggable="true" data-type="llm" data-subtype="lmstudio">
-                        <div class="component-icon">🎬</div>
-                        <span>LM Studio</span>
-                    </div>
-                    <div class="component-item" draggable="true" data-type="llm" data-subtype="ollama">
-                        <div class="component-icon">🦙</div>
-                        <span>Ollama</span>
-                    </div>
-                </div>
+                <!-- Dynamic content will be rendered here -->
             </aside>
 
             <!-- Canvas Area -->
@@ -179,6 +124,20 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Core JavaScript Modules -->
+    <script src="js/core/event-bus.js"></script>
+    <script src="js/core/api-client.js"></script>
+    <script src="js/core/component-manager.js"></script>
+    <script src="js/core/ui-manager.js"></script>
+    <script src="js/core/pipeline-manager.js"></script>
+    <script src="js/core/query-manager.js"></script>
+    
+    <!-- Extended Modules -->
+    <script src="js/modules/plugin-manager.js"></script>
+    <script src="js/modules/rag-tester.js"></script>
+    <script src="js/modules/document-processor.js"></script>
+    
+    <!-- Main Application -->
+    <script src="js/app.js"></script>
 </body>
 </html>

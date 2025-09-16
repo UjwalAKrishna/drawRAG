@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Classes</title>
+</head>
+<body>
+    <h1>Debug: Check if classes are loaded</h1>
+    <div id="output"></div>
+
+    <!-- Load the modules -->
+    <script src="js/core/event-bus.js"></script>
+    <script src="js/core/api-client.js"></script>
+    <script src="js/modules/plugin-manager.js"></script>
+    <script src="js/modules/rag-tester.js"></script>
+    <script src="js/modules/document-processor.js"></script>
+    
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message) {
+            output.innerHTML += '<p>' + message + '</p>';
+            console.log(message);
+        }
+        
+        // Check if classes are available
+        log('Checking classes...');
+        
+        if (typeof EventBus !== 'undefined') {
+            log('✅ EventBus loaded');
+        } else {
+            log('❌ EventBus NOT loaded');
+        }
+        
+        if (typeof APIClient !== 'undefined') {
+            log('✅ APIClient loaded');
+        } else {
+            log('❌ APIClient NOT loaded');
+        }
+        
+        if (typeof PluginManager !== 'undefined') {
+            log('✅ PluginManager loaded');
+        } else {
+            log('❌ PluginManager NOT loaded');
+        }
+        
+        if (typeof RAGTester !== 'undefined') {
+            log('✅ RAGTester loaded');
+        } else {
+            log('❌ RAGTester NOT loaded');
+        }
+        
+        if (typeof DocumentProcessor !== 'undefined') {
+            log('✅ DocumentProcessor loaded');
+        } else {
+            log('❌ DocumentProcessor NOT loaded');
+        }
+        
+        // Try to create instances
+        try {
+            const eventBus = new EventBus();
+            const apiClient = new APIClient();
+            log('✅ Basic classes work');
+            
+            const pluginManager = new PluginManager(apiClient, eventBus);
+            log('✅ PluginManager instantiated');
+            
+            const ragTester = new RAGTester(apiClient, eventBus);
+            log('✅ RAGTester instantiated');
+            
+            const documentProcessor = new DocumentProcessor(apiClient, eventBus);
+            log('✅ DocumentProcessor instantiated');
+            
+            log('🎉 All classes working correctly!');
+            
+        } catch (error) {
+            log('❌ Error: ' + error.message);
+        }
+    </script>
+</body>
+</html>

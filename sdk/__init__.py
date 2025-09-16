@@ -2,15 +2,46 @@
 RAG Builder SDK - Plugin Development Kit
 """
 
-from .base_plugin import BasePlugin
-from .data_source_plugin import BaseDataSourcePlugin
-from .vector_db_plugin import BaseVectorDBPlugin
-from .llm_plugin import BaseLLMPlugin
+# Import standardized framework classes
+import sys
+from pathlib import Path
 
-__version__ = "1.0.0"
+# Add backend to path
+backend_path = Path(__file__).parent.parent / "backend"
+sys.path.insert(0, str(backend_path))
+
+# Import from core framework
+from core import (
+    Plugin, BasePlugin, QuickPlugin, 
+    DataSourcePlugin, VectorDBPlugin, LLMPlugin,
+    capability, event_handler, requires, provides_schema,
+    create_plugin
+)
+
+# Legacy compatibility
+BaseDataSourcePlugin = DataSourcePlugin
+BaseVectorDBPlugin = VectorDBPlugin
+BaseLLMPlugin = LLMPlugin
+
+__version__ = "2.0.0"
 __all__ = [
+    # New standardized classes
+    "Plugin",
     "BasePlugin",
-    "BaseDataSourcePlugin", 
-    "BaseVectorDBPlugin",
+    "QuickPlugin",
+    "DataSourcePlugin", 
+    "VectorDBPlugin",
+    "LLMPlugin",
+    
+    # Decorators and utilities
+    "capability",
+    "event_handler",
+    "requires", 
+    "provides_schema",
+    "create_plugin",
+    
+    # Legacy compatibility
+    "BaseDataSourcePlugin",
+    "BaseVectorDBPlugin", 
     "BaseLLMPlugin"
 ]
