@@ -846,18 +846,42 @@ body {
 
 /* Connection Lines */
 .connection-line {
-    stroke: #4299e1 !important;
-    stroke-width: 3px !important;
-    fill: none !important;
-    opacity: 1 !important;
-    z-index: 100 !important;
+    display: none !important;
 }
 
-.connection-path {
-    stroke: #4299e1 !important;
-    stroke-width: 3px !important;
+.connection-line svg {
+    display: none !important;
+}
+
+/* Remove universal selector */
+
+path {
+    stroke: #ff0000 !important;
+    stroke-width: 10px !important;
+    fill: none !important;
+}
+
+path.connection-path {
+    stroke: #ff0000 !important;
+    stroke-width: 10px !important;
     fill: none !important;
     opacity: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+}
+
+svg path {
+    stroke: #ff0000 !important;
+    stroke-width: 10px !important;
+    fill: none !important;
+}
+
+.connection-line svg path {
+    stroke: #ff0000 !important;
+    stroke-width: 10px !important;
+    fill: none !important;
 }
 
 .connection-svg {

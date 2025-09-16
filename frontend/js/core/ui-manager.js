@@ -443,6 +443,9 @@ class UIManager {
 
                 element.style.left = `${constrainedX}px`;
                 element.style.top = `${constrainedY}px`;
+                
+                // Update connection lines during drag
+                this.updateSimpleConnectionLines();
             };
 
             const handleMouseUp = () => {
@@ -577,7 +580,7 @@ class UIManager {
             console.log('Connection created:', connection);
             
             // Draw the connection line immediately
-            this.drawConnectionLine(connection);
+            this.drawSimpleConnectionLine(connection);
         }
         
         this.cancelConnection();
@@ -695,6 +698,81 @@ class UIManager {
         console.log('Connection line drawn:', fromX, fromY, '->', toX, toY);
         console.log('SVG element:', svg);
         console.log('Line element:', line);
+    }
+
+    /**
+     * Draw simple connection line that definitely works
+     * @param {Object} connection 
+     */
+    drawSimpleConnectionLine(connection) {
+        const fromElement = document.getElementById(connection.from);
+        const toElement = document.getElementById(connection.to);
+        
+        if (!fromElement || !toElement) {
+            console.log('Connection elements not found:', connection.from, connection.to);
+            return;
+        }
+
+        // Get port positions instead of center positions
+        const fromPort = fromElement.querySelector('.output-port');
+        const toPort = toElement.querySelector('.input-port');
+        
+        if (!fromPort || !toPort) {
+            console.log('Ports not found for connection');
+            return;
+        }
+
+        const canvasRect = this.canvasElement.getBoundingClientRect();
+        const fromRect = fromPort.getBoundingClientRect();
+        const toRect = toPort.getBoundingClientRect();
+
+        // Calculate port center positions
+        const fromX = fromRect.left + fromRect.width/2 - canvasRect.left;
+        const fromY = fromRect.top + fromRect.height/2 - canvasRect.top;
+        const toX = toRect.left + toRect.width/2 - canvasRect.left;
+        const toY = toRect.top + toRect.height/2 - canvasRect.top;
+
+        // Create simple div-based line
+        const line = document.createElement('div');
+        line.className = 'simple-connection-line';
+        line.dataset.connectionId = connection.id;
+        
+        // Calculate line properties
+        const deltaX = toX - fromX;
+        const deltaY = toY - fromY;
+        const length = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+        
+        // Position and style the line
+        line.style.position = 'absolute';
+        line.style.left = fromX + 'px';
+        line.style.top = fromY + 'px';
+        line.style.width = length + 'px';
+        line.style.height = '4px';
+        line.style.background = '#ff0000';
+        line.style.transformOrigin = '0 50%';
+        line.style.transform = `rotate(${angle}deg)`;
+        line.style.zIndex = '1000';
+        line.style.pointerEvents = 'none';
+        
+        this.canvasElement.appendChild(line);
+        
+        console.log('Simple connection line created:', fromX, fromY, '->', toX, toY, 'length:', length, 'angle:', angle);
+    }
+
+    /**
+     * Update all simple connection lines
+     */
+    updateSimpleConnectionLines() {
+        if (!this.connections) return;
+        
+        // Remove existing simple lines
+        document.querySelectorAll('.simple-connection-line').forEach(line => line.remove());
+        
+        // Redraw all connections
+        this.connections.forEach(connection => {
+            this.drawSimpleConnectionLine(connection);
+        });
     }
 
     /**
